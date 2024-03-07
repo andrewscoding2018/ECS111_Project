@@ -1,6 +1,9 @@
 "use client"
 import { useState, ChangeEvent } from 'react';
 
+const URL = "https://ecs111-test-6dklnz6zma-uw.a.run.app/classify"
+const localURL = "localhost:8000"
+console.log(URL)
 
 interface IResponse {
   data?: string;
@@ -37,7 +40,7 @@ const Home: React.FC = () => {
   const handleSubmit = async (): Promise<void> => {
     setResponse({});
     try {
-      const res = await fetch('http://localhost:8000/classify', {
+      const res = await fetch(URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
