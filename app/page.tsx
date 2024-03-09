@@ -135,7 +135,7 @@ const Home: React.FC = () => {
         <div className="flex flex-col justify-center items-center gap-5 w-full">
           {/* Numerical Fields */}
           <div className="grid md:grid-cols-2 grid-cols-1 gap-10 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="col-span-2 text-slate-700 text-xl">Numerical Fields</div>
+            <div className="col-span-2 text-slate-700 text-xl font-bold">Numerical Fields</div>
             <NumInput
               name={numericalFields[0]}
               value={10}
@@ -164,7 +164,7 @@ const Home: React.FC = () => {
 
           {/* Area Types */}
           <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 p-0">Area Types</div>
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 p-0 font-bold">Area Types</div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Area"))
               .map((value, index) => (
@@ -182,7 +182,7 @@ const Home: React.FC = () => {
 
           {/* Cities */}
           <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">City</div>
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">City</div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("City_"))
               .map((value, index) => (
@@ -201,7 +201,7 @@ const Home: React.FC = () => {
 
           {/* Furnishing Status */}
           <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">Furnishing status</div>
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">Furnishing status</div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Furnishing_Status_"))
               .map((value, index) => (
@@ -221,7 +221,7 @@ const Home: React.FC = () => {
 
           {/* Tenant Preference */}
           <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">Tenant Preference</div>
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">Tenant Preference</div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Tenant_Preferred_"))
               .map((value, index) => (
@@ -241,7 +241,7 @@ const Home: React.FC = () => {
 
           {/* Tenant Preference */}
           <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">Point of Contact</div>
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">Point of Contact</div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Point_of_Contact_Contact_"))
               .map((value, index) => (
