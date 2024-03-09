@@ -1,15 +1,19 @@
 "use client";
 import {
   useState,
+  useEffect,
   ChangeEvent,
   ChangeEventHandler,
   MouseEventHandler,
+  SetStateAction,
 } from "react";
-import FormSection from "./FormSection";
+import MultiSelect from "./MultiSelect";
+import NumInput from "./NumInput";
+import Charts from "./Charts";
 
-// const URL = "https://ecs111-test-6dklnz6zma-uw.a.run.app/classify";
-const URL = "http://localhost:8000/classify";
-console.log(URL);
+const environment = process.env.NEXT_PUBLIC_NODE_ENV
+
+const serverURL = (environment == "development") ? process.env.NEXT_PUBLIC_LOCAL : process.env.NEXT_PUBLIC_GCP
 
 interface IResponse {
   data?: string;
@@ -52,6 +56,11 @@ const Home: React.FC = () => {
   const [selectedTenantPreference, setSelectedTenantPreference] = useState("");
   const [selectedPointOfContact, setSelectedPointOfContact] = useState("");
 
+  const [activeTab, setActiveTab] = useState('tab1');
+  const handleTabClick = (tabId: SetStateAction<string>) => {
+    setActiveTab(tabId);
+  };
+
   const [response, setResponse] = useState<IResponse>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,10 +68,22 @@ const Home: React.FC = () => {
     setResponse({});
     setIsLoading(true);
 
+    if (selectedFurnishingStatus == "" || selectedTenantPreference == "" || selectedPointOfContact == "") {
+      setResponse({
+        error: "You must select an option from each field."
+      })
+      setIsLoading(false)
+      return
+    }
+
     // Timeout to prevent inconsistent load times (set to 0 when working in dev mode for faster load times)
     const minTimeout = new Promise((resolve: any) => setTimeout(resolve, 0));
 
-    const res = await fetch(URL, {
+    if (typeof serverURL === 'undefined') {
+      throw new Error('Server URL is not defined');
+    }
+
+    const res = await fetch(serverURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +100,7 @@ const Home: React.FC = () => {
       }
 
       const data = await fetchResult.json();
-      setResponse({ data: JSON.stringify(data, null, 2) });
+      setResponse({ data: data["prediction"] });
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error:", error.message);
@@ -95,146 +116,180 @@ const Home: React.FC = () => {
     setJsonData((prevState) => ({ ...prevState, [name]: Number(value) }));
   };
 
+  useEffect(() => {
+    console.log(jsonData);
+  }, [jsonData]);
+
   return (
-    <div className="flex flex-col justify-center items-center gap-10">
-      <h1 className="text-5xl font-semibold pt-10">
-        Indian Housing Rent Classifier
+    <div className="flex flex-col justify-center items-center gap-5">
+      <h1 className="text-3xl font-semibold pt-5">
+        India Major City Housing Rent Prediction
       </h1>
 
-      {/* Numerical Fields */}
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-10 w-[90%] p-10 bg-neutral rounded-[20px]">
-        <div className="col-span-2 text-2xl">Numerical Fields</div>
-        {Object.keys(jsonData)
-          .filter((attr) => numericalFields.includes(attr))
-          .map((attr, index) => (
-            <label key={index} className="form-control ">
-              <div className="label">
-                <span className="label-text">{attr.replaceAll("_", " ")}</span>
+      <div role="tablist" className="tabs tabs-bordered">
+        <a role="tab" className={`tab ${activeTab === 'tab1' ? 'tab-active' : ''}`} onClick={() => handleTabClick('tab1')}>Prediction</a>
+        <a role="tab" className={`tab ${activeTab === 'tab2' ? 'tab-active' : ''}`} onClick={() => handleTabClick('tab2')}>Charts</a>
+      </div>
+
+      {activeTab == "tab1" && (
+        <div className="flex flex-col justify-center items-center gap-5 w-full">
+          {/* Numerical Fields */}
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-10 w-[90%] p-5 bg-slate-100 rounded-md">
+            <div className="col-span-2 text-slate-700 text-xl">Numerical Fields</div>
+            <NumInput
+              name={numericalFields[0]}
+              value={10}
+              handleChange={handleChange}
+              displayName="Bedrooms"
+            />
+            <NumInput
+              name={numericalFields[1]}
+              value={30}
+              handleChange={handleChange}
+              displayName="Size"
+            />
+            <NumInput
+              name={numericalFields[2]}
+              value={10}
+              handleChange={handleChange}
+              displayName="Bathrooms"
+            />
+            <NumInput
+              name={numericalFields[3]}
+              value={10}
+              handleChange={handleChange}
+              displayName="Floor Ratio"
+            />
+          </div>
+
+          {/* Area Types */}
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 p-0">Area Types</div>
+            {Object.keys(jsonData)
+              .filter((key) => key.startsWith("Area"))
+              .map((value, index) => (
+                <MultiSelect
+                  index={index}
+                  key={index}
+                  name={"area"}
+                  selectedValue={selectedArea}
+                  setSelectedValue={setSelectedArea}
+                  value={value}
+                  displayName={value.replace("Area_Type_", " ").replace("_", " ")}
+                />
+              ))}
+          </div>
+
+          {/* Cities */}
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">City</div>
+            {Object.keys(jsonData)
+              .filter((key) => key.startsWith("City_"))
+              .map((value, index) => (
+                <MultiSelect
+                  index={index}
+                  key={index}
+                  name={"city"}
+                  selectedValue={selectedCity}
+                  setSelectedValue={setSelectedCity}
+                  value={value}
+                  displayName={value.replace("City_", "")}
+                />
+              ))}
+          </div>
+
+
+          {/* Furnishing Status */}
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">Furnishing status</div>
+            {Object.keys(jsonData)
+              .filter((key) => key.startsWith("Furnishing_Status_"))
+              .map((value, index) => (
+                <MultiSelect
+                  index={index}
+                  key={index}
+                  name={"furnishing_status"}
+                  selectedValue={selectedFurnishingStatus}
+                  setSelectedValue={setSelectedFurnishingStatus}
+                  value={value}
+                  displayName={value
+                    .replace("Furnishing_Status_", "")
+                    .replace("_", "-")}
+                />
+              ))}
+          </div>
+
+          {/* Tenant Preference */}
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">Tenant Preference</div>
+            {Object.keys(jsonData)
+              .filter((key) => key.startsWith("Tenant_Preferred_"))
+              .map((value, index) => (
+                <MultiSelect
+                  index={index}
+                  key={index}
+                  name={"tenant_preferred"}
+                  selectedValue={selectedTenantPreference}
+                  setSelectedValue={setSelectedTenantPreference}
+                  value={value}
+                  displayName={value
+                    .replace("Tenant_Preferred_", "")
+                    .replace("_", "/")}
+                />
+              ))}
+          </div>
+
+          {/* Tenant Preference */}
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
+            <div className="md:col-span-3 col-span-1 text-xl text-slate-700">Point of Contact</div>
+            {Object.keys(jsonData)
+              .filter((key) => key.startsWith("Point_of_Contact_Contact_"))
+              .map((value, index) => (
+                <MultiSelect
+                  index={index}
+                  key={index}
+                  name={"Point_of_Contact_Contact_"}
+                  selectedValue={selectedPointOfContact}
+                  setSelectedValue={setSelectedPointOfContact}
+                  value={value}
+                  displayName={value
+                    .replace("Point_of_Contact_Contact_", "")
+                    .replace("_", " ")}
+                />
+              ))}
+          </div>
+
+          <div className="mb-40">
+            <button
+              className="btn btn-outline btn-primary my-5 w-80"
+              onClick={handleSubmit}
+            >
+              Submit
+            </button>
+            {/* Loading box */}
+            {isLoading && <progress className="progress progress-primary w-32" />}
+            {/* Output */}
+            {response.data && (
+              <div className="mt-4 p-2 border border-green-500 rounded-lg bg-green-50">
+                <h2 className="font-bold">The cost of your monthly rent (in rupees) is:</h2>
+                <p>{response.data}₹</p>
               </div>
-              <input
-                type="text"
-                name={attr}
-                placeholder={"Enter a value here"}
-                onChange={handleChange}
-                className="input input-bordered"
-              />
-            </label>
-          ))}
-      </div>
-
-      {/* Area Types */}
-      <div className="grid md:grid-cols-3 grid-cols-1 gap-10 w-[90%] p-10 bg-neutral rounded-[20px]">
-        <div className="col-span-3 text-2xl">Area Types</div>
-        {Object.keys(jsonData)
-          .filter((key) => key.startsWith("Area"))
-          .map((value, index) => (
-            <FormSection
-              index={index}
-              name={"area"}
-              selectedValue={selectedArea}
-              setSelectedValue={setSelectedArea}
-              value={value}
-              displayName={value.replace("Area_Type_", " ").replace("_", " ")}
-            />
-          ))}
-      </div>
-
-      {/* Cities */}
-      <div className="grid md:grid-cols-3 grid-cols-1 gap-10 w-[90%] p-10 bg-neutral rounded-[20px]">
-        <div className="col-span-3 text-2xl">City</div>
-        {Object.keys(jsonData)
-          .filter((key) => key.startsWith("City_"))
-          .map((value, index) => (
-            <FormSection
-              index={index}
-              name={"city"}
-              selectedValue={selectedCity}
-              setSelectedValue={setSelectedCity}
-              value={value}
-              displayName={value.replace("City_", "")}
-            />
-          ))}
-      </div>
-
-      {/* Furnishing Status */}
-      <div className="grid md:grid-cols-3 grid-cols-1 gap-10 w-[90%] p-10 bg-neutral rounded-[20px]">
-        <div className="col-span-3 text-2xl">Furnishing status</div>
-        {Object.keys(jsonData)
-          .filter((key) => key.startsWith("Furnishing_Status_"))
-          .map((value, index) => (
-            <FormSection
-              index={index}
-              name={"furnishing_status"}
-              selectedValue={selectedFurnishingStatus}
-              setSelectedValue={setSelectedFurnishingStatus}
-              value={value}
-              displayName={value
-                .replace("Furnishing_Status_", "")
-                .replace("_", "-")}
-            />
-          ))}
-      </div>
-
-      {/* Tenant Preference */}
-      <div className="grid md:grid-cols-3 grid-cols-1 gap-10 w-[90%] p-10 bg-neutral rounded-[20px]">
-        <div className="col-span-3 text-2xl">Tenant Preference</div>
-        {Object.keys(jsonData)
-          .filter((key) => key.startsWith("Tenant_Preferred_"))
-          .map((value, index) => (
-            <FormSection
-              index={index}
-              name={"tenant_preferred"}
-              selectedValue={selectedTenantPreference}
-              setSelectedValue={setSelectedTenantPreference}
-              value={value}
-              displayName={value
-                .replace("Tenant_Preferred_", "")
-                .replace("_", "/")}
-            />
-          ))}
-      </div>
-
-      {/* Tenant Preference */}
-      <div className="grid md:grid-cols-3 grid-cols-1 gap-10 w-[90%] p-10 bg-neutral rounded-[20px]">
-        <div className="col-span-3 text-2xl">Point of Contact</div>
-        {Object.keys(jsonData)
-          .filter((key) => key.startsWith("Point_of_Contact_Contact_"))
-          .map((value, index) => (
-            <FormSection
-              index={index}
-              name={"Point_of_Contact_Contact_"}
-              selectedValue={selectedPointOfContact}
-              setSelectedValue={setSelectedPointOfContact}
-              value={value}
-              displayName={value
-                .replace("Point_of_Contact_Contact_", "")
-                .replace("_", " ")}
-            />
-          ))}
-      </div>
-
-      <button
-        className="btn btn-outline btn-primary my-5 w-80"
-        onClick={handleSubmit}
-      >
-        Submit
-      </button>
-      {/* Loading box */}
-      {isLoading && <progress className="progress progress-primary w-32" />}
-      {/* Output */}
-      {response.data && (
-        <div className="mt-4 p-2 border border-green-500 rounded-lg bg-green-50">
-          <h2 className="font-bold">Response:</h2>
-          <p>{response.data}</p>
+            )}
+            {response.error && (
+              <div className="mt-4 p-2 border border-red-500 rounded-lg bg-red-50">
+                <h2 className="font-bold">Error:</h2>
+                <p>{response.error}</p>
+              </div>
+            )}
+          </div>
         </div>
+
       )}
-      {response.error && (
-        <div className="mt-4 p-2 border border-red-500 rounded-lg bg-red-50">
-          <h2 className="font-bold">Error:</h2>
-          <p>{response.error}</p>
-        </div>
+      {activeTab == "tab2" && (
+        <Charts />
       )}
     </div>
+
   );
 };
 
