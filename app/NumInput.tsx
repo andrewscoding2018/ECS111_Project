@@ -16,7 +16,7 @@ const NumInput = ({
     return (
         <label className="form-control ">
             <div className="label">
-                <span className="text-slate-700 label-text">{displayName}</span>
+                <span className="text-slate-700 label-text font-bold">{displayName}</span>
             </div>
             <input
                 type="text"
