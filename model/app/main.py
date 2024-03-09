@@ -9,6 +9,8 @@ from io import BytesIO
 from PIL import Image
 import numpy as np
 import pandas as pd
+import pickle
+from sklearn.preprocessing import StandardScaler
 
 
 class HouseFeatures(BaseModel):
@@ -60,6 +62,10 @@ app.add_middleware(
 # model pre-trained on ImageNet data
 model = tf.keras.models.load_model("app/model.h5")
 
+# Load scaler
+with open('app/scaler.pkl', 'rb') as f:
+    scaler = pickle.load(f)
+
 # Assuming the HouseFeatures model and the model for predictions are defined elsewhere
 
 @app.post("/classify")
@@ -67,7 +73,40 @@ async def classify_result(features: HouseFeatures):
     try:
         # Convert the Pydantic model instance to a DataFrame
         # Assuming you meant features.dict() instead of model_dump() which is not a standard Pydantic method
-        data = pd.DataFrame([features.dict()])
+
+        # Convert column names to original model column names
+        column_names = [
+            'BHK',
+            'Size',
+            'Bathroom',
+            'Floor_Ratio',
+            'Area Type_Built Area',
+            'Area Type_Carpet Area',
+            'Area Type_Super Area',
+            'City_Bangalore',
+            'City_Chennai',
+            'City_Delhi',
+            'City_Hyderabad',
+            'City_Kolkata',
+            'City_Mumbai',
+            'Furnishing Status_Furnished',
+            'Furnishing Status_Semi-Furnished',
+            'Furnishing Status_Unfurnished',
+            'Tenant Preferred_Bachelors',
+            'Tenant Preferred_Bachelors/Family',
+            'Tenant Preferred_Family',
+            'Point of Contact_Contact Agent',
+            'Point of Contact_Contact Builder',
+            'Point of Contact_Contact Owner'
+        ]
+
+        # 
+        adjusted_features = {}
+
+        for i, name in enumerate(column_names):
+            adjusted_features[name] = list(features.dict().values())[i]
+
+        data = scaler.transform(pd.DataFrame([adjusted_features]))
         
         try:
             # Make predictions with the model
