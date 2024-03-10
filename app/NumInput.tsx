@@ -2,14 +2,14 @@ import React, { ChangeEvent } from "react";
 
 interface Props {
     name: string;
-    value: number;
+    placeholder: string;
     displayName: string;
     handleChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const NumInput = ({
     name,
-    value,
+    placeholder,
     displayName,
     handleChange
 }: Props) => {
@@ -21,7 +21,7 @@ const NumInput = ({
             <input
                 type="text"
                 name={name}
-                value={value}
+                placeholder={placeholder}
                 onChange={handleChange}
                 className="text-sm input input-bordered"
             />

@@ -16,7 +16,7 @@ const environment = process.env.NEXT_PUBLIC_NODE_ENV
 const serverURL = (environment == "development") ? process.env.NEXT_PUBLIC_LOCAL : process.env.NEXT_PUBLIC_GCP
 
 interface IResponse {
-  data?: string;
+  data?: number;
   error?: string;
 }
 
@@ -76,6 +76,16 @@ const Home: React.FC = () => {
       return
     }
 
+    for (var key in numericalFields) {
+      if (jsonData[key] == 0.0) {
+        setResponse({
+          error: "You must provide a value for each numerical field."
+        })
+        setIsLoading(false)
+        return
+      }
+    }
+
     // Timeout to prevent inconsistent load times (set to 0 when working in dev mode for faster load times)
     const minTimeout = new Promise((resolve: any) => setTimeout(resolve, 0));
 
@@ -83,12 +93,24 @@ const Home: React.FC = () => {
       throw new Error('Server URL is not defined');
     }
 
+    const payload = {
+      ...jsonData, // existing numerical fields and others
+      // Add or update these fields in the payload
+      [selectedArea]: 1,
+      [selectedCity]: 1,
+      [selectedFurnishingStatus]: 1,
+      [selectedTenantPreference]: 1,
+      [selectedPointOfContact]: 1,
+    };
+
+    // console.log(payload)
+
     const res = await fetch(serverURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(jsonData, null, 2),
+      body: JSON.stringify(payload, null, 2),
     });
 
     try {
@@ -116,13 +138,13 @@ const Home: React.FC = () => {
     setJsonData((prevState) => ({ ...prevState, [name]: Number(value) }));
   };
 
-  useEffect(() => {
-    console.log(jsonData);
-  }, [jsonData]);
+  // useEffect(() => {
+  //   console.log(jsonData);
+  // }, [jsonData]);
 
   return (
     <div className="flex flex-col justify-center items-center gap-5">
-      <h1 className="text-3xl font-semibold pt-5">
+      <h1 className="md:text-3xl text-xl flex-wrap  m-3 font-semibold pt-5">
         India Major City Housing Rent Prediction
       </h1>
 
@@ -135,28 +157,28 @@ const Home: React.FC = () => {
         <div className="flex flex-col justify-center items-center gap-5 w-full">
           {/* Numerical Fields */}
           <div className="grid md:grid-cols-2 grid-cols-1 gap-10 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="col-span-2 text-slate-700 text-xl font-bold">Numerical Fields</div>
+            <div className="md:col-span-2 text-slate-700 text-xl font-bold">Numerical Fields</div>
             <NumInput
               name={numericalFields[0]}
-              value={10}
+              placeholder={"3"}
               handleChange={handleChange}
               displayName="Bedrooms"
             />
             <NumInput
               name={numericalFields[1]}
-              value={30}
+              placeholder={"3000"}
               handleChange={handleChange}
               displayName="Size"
             />
             <NumInput
               name={numericalFields[2]}
-              value={10}
+              placeholder={"1"}
               handleChange={handleChange}
               displayName="Bathrooms"
             />
             <NumInput
               name={numericalFields[3]}
-              value={10}
+              placeholder={"1"}
               handleChange={handleChange}
               displayName="Floor Ratio"
             />
@@ -271,8 +293,9 @@ const Home: React.FC = () => {
             {/* Output */}
             {response.data && (
               <div className="mt-4 p-2 border border-green-500 rounded-lg bg-green-50">
-                <h2 className="font-bold">The cost of your monthly rent (in rupees) is:</h2>
-                <p>{response.data}₹</p>
+                <h2 className="font-bold">Your monthly rent (in rupees) costs:</h2>
+                <br></br>
+                <p>{Math.trunc(response.data)}₹</p>
               </div>
             )}
             {response.error && (
