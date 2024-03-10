@@ -76,10 +76,11 @@ const Home: React.FC = () => {
       return
     }
 
-    for (var key in numericalFields) {
-      if (jsonData[key] == 0.0) {
+    for (var key of numericalFields) {
+      console.log(key)
+      if (jsonData[key] <= 0) {
         setResponse({
-          error: "You must provide a value for each numerical field."
+          error: "You must provide a positive value for each numerical field."
         })
         setIsLoading(false)
         return
