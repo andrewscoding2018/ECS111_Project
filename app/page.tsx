@@ -161,25 +161,25 @@ const Home: React.FC = () => {
             <div className="md:col-span-2 text-slate-700 text-xl font-bold">Numerical Fields</div>
             <NumInput
               name={numericalFields[0]}
-              placeholder={"3"}
+              placeholder={"Try a value like 3"}
               handleChange={handleChange}
               displayName="Bedrooms"
             />
             <NumInput
               name={numericalFields[1]}
-              placeholder={"3000"}
+              placeholder={"Try a value like 2000"}
               handleChange={handleChange}
               displayName="Size"
             />
             <NumInput
               name={numericalFields[2]}
-              placeholder={"1"}
+              placeholder={"Try a value like 1"}
               handleChange={handleChange}
               displayName="Bathrooms"
             />
             <NumInput
               name={numericalFields[3]}
-              placeholder={"1"}
+              placeholder={"Try a value like 0.5"}
               handleChange={handleChange}
               displayName="Floor Ratio"
             />
