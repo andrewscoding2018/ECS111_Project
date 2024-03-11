@@ -58,6 +58,8 @@ const Home: React.FC = () => {
   const [selectedFurnishingStatus, setSelectedFurnishingStatus] = useState("");
   const [selectedTenantPreference, setSelectedTenantPreference] = useState("");
   const [selectedPointOfContact, setSelectedPointOfContact] = useState("");
+  let pickedFloorRatio = false
+
 
   const [activeTab, setActiveTab] = useState("tab1");
   const handleTabClick = (tabId: SetStateAction<string>) => {
@@ -83,7 +85,7 @@ const Home: React.FC = () => {
       return;
     }
 
-    for (var key of numericalFields) {
+    for (var key of numericalFields.slice(0, 3)) {
       console.log(key);
       if (jsonData[key] <= 0) {
         setResponse({
@@ -110,6 +112,10 @@ const Home: React.FC = () => {
       [selectedTenantPreference]: 1,
       [selectedPointOfContact]: 1,
     };
+
+    if (!pickedFloorRatio) {
+      payload["Floor_Ratio"] = 0.5
+    }
 
     // console.log(payload)
 
@@ -144,6 +150,12 @@ const Home: React.FC = () => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = event.target;
     setJsonData((prevState) => ({ ...prevState, [name]: Number(value) }));
+  };
+
+  const handleRangeChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = event.target;
+    setJsonData((prevState) => ({ ...prevState, [name]: Number(value) }));
+    pickedFloorRatio = true
   };
 
   useEffect(() => {
@@ -182,7 +194,7 @@ const Home: React.FC = () => {
             </div>
             <NumInput
               name={numericalFields[0]}
-              placeholder={"How often are in-laws staying over?"}
+              placeholder={"How often are in-laws staying over? :)"}
               handleChange={handleChange}
               displayName="Bedrooms"
             />
