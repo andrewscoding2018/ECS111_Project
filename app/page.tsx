@@ -146,12 +146,12 @@ const Home: React.FC = () => {
     setJsonData((prevState) => ({ ...prevState, [name]: Number(value) }));
   };
 
-  // useEffect(() => {
-  //   console.log(jsonData);
-  // }, [jsonData]);
+  useEffect(() => {
+    console.log(jsonData);
+  }, [jsonData]);
 
   return (
-    <div className="flex flex-col justify-center items-center gap-5">
+    <div className="flex flex-col justify-center items-center gap-3 bg-base-200">
       <h1 className="md:text-3xl text-xl flex-wrap m-3 font-semibold pt-5">
         India Major City Housing Rent Prediction
       </h1>
@@ -174,10 +174,10 @@ const Home: React.FC = () => {
       </div>
 
       {activeTab == "tab1" && (
-        <div className="flex flex-col justify-center items-center gap-10 w-full">
+        <div className="flex flex-col justify-center items-center gap-6 w-full">
           {/* Numerical Fields */}
-          <div className="grid md:grid-cols-2 grid-cols-1 gap-10 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
-            <div className="md:col-span-2 text-xl font-bold">
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-2 w-[90%] p-5 bg-base-100 rounded-md shadow-md">
+            <div className="md:col-span-2 text-xl font-medium">
               Numerical Fields
             </div>
             <NumInput
@@ -198,17 +198,37 @@ const Home: React.FC = () => {
               handleChange={handleChange}
               displayName="Bathrooms"
             />
-            <NumInput
+
+            <label className="form-control">
+              <div className="label">
+                <span className="label-text text-gray-600">Floor height ratio (0 is ground floor, 1 is penthouse)</span>
+              </div>
+              <div className="flex ml-2 mr-4 mt-3">
+                <p className="text-gray-300">0</p>
+                <input
+                  type="range"
+                  name={numericalFields[3]}
+                  min={0}
+                  max="1"
+                  step={0.1}
+                  onChange={handleChange}
+                  className="range range-sm mx-4" />
+
+                <p>1</p>
+              </div>
+            </label>
+            {/* <NumInput
               name={numericalFields[3]}
-              placeholder={"(Apartment's Floor)/(Total Floors)"}
+              placeholder={"Apartment's Floor/Total Floors"}
               handleChange={handleChange}
-              displayName="Floor Ratio"
-            />
+              displayName="Floor Ratio (desired relative apartment height - Apartment's Floor/Total Floors)"
+            /> */}
+
           </div>
 
           {/* Area Types */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
-            <div className="md:col-span-3 col-span-1 text-xl  p-0 font-bold">
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-100 rounded-md shadow-md">
+            <div className="md:col-span-3 text-xl font-medium">
               Area Types
             </div>
             {Object.keys(jsonData)
@@ -229,8 +249,8 @@ const Home: React.FC = () => {
           </div>
 
           {/* Cities */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
-            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-100 rounded-md shadow-md">
+            <div className="md:col-span-3 text-xl font-medium">
               City
             </div>
             {Object.keys(jsonData)
@@ -249,8 +269,8 @@ const Home: React.FC = () => {
           </div>
 
           {/* Furnishing Status */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
-            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-100 rounded-md shadow-md">
+            <div className="md:col-span-3 text-xl font-medium">
               Furnishing status
             </div>
             {Object.keys(jsonData)
@@ -271,8 +291,8 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tenant Preference */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
-            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-100 rounded-md shadow-md">
+            <div className="md:col-span-3 text-xl font-medium">
               Tenant Preference
             </div>
             {Object.keys(jsonData)
@@ -293,8 +313,8 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tenant Preference */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
-            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-100 rounded-md shadow-md">
+            <div className="md:col-span-3 text-xl font-medium">
               Point of Contact
             </div>
             {Object.keys(jsonData)
@@ -316,7 +336,7 @@ const Home: React.FC = () => {
 
           <div className="flex flex-col justify-center items-center mb-40">
             <button
-              className="btn btn-outline btn-primary my-5 w-80"
+              className="btn btn-outline btn-primary my-5 w-80 bg-base-100"
               onClick={handleSubmit}
             >
               Submit

@@ -11,14 +11,14 @@ const NumInput = ({ name, placeholder, displayName, handleChange }: Props) => {
   return (
     <label className="form-control">
       <div className="label">
-        <span className="label-text font-bold">{displayName}</span>
+        <span className="label-text text-gray-600">{displayName}</span>
       </div>
       <input
         type="text"
         name={name}
         placeholder={placeholder}
         onChange={handleChange}
-        className="text-sm input outline-base-400 outline-1"
+        className="text-sm input bg-base-200"
       />
     </label>
   );

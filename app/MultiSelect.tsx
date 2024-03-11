@@ -20,7 +20,7 @@ const MultiSelect = ({
   return (
     <label
       key={index}
-      className="form-control flex p-0 outline outline-1	bg-base-100 hover:brightness-90 outline-base-300 rounded-md"
+      className="form-control flex p-0 bg-base-200 hover:brightness-90 rounded-md"
     >
       <div className="flex p-3 rounded">
         <input
@@ -34,7 +34,7 @@ const MultiSelect = ({
           }}
           className="radio mr-4 align-middle "
         />
-        <p className="text-sm align-middle">{displayName}</p>
+        <p className="text-sm align-middle text-gray-500">{displayName}</p>
       </div>
     </label>
   );
