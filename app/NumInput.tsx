@@ -9,7 +9,7 @@ interface Props {
 
 const NumInput = ({ name, placeholder, displayName, handleChange }: Props) => {
   return (
-    <label className="form-control ">
+    <label className="form-control">
       <div className="label">
         <span className="label-text font-bold">{displayName}</span>
       </div>
@@ -18,7 +18,7 @@ const NumInput = ({ name, placeholder, displayName, handleChange }: Props) => {
         name={name}
         placeholder={placeholder}
         onChange={handleChange}
-        className="text-sm input input-bordered"
+        className="text-sm input outline-base-400 outline-1"
       />
     </label>
   );

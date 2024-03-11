@@ -182,25 +182,25 @@ const Home: React.FC = () => {
             </div>
             <NumInput
               name={numericalFields[0]}
-              placeholder={"Try a value like 3"}
+              placeholder={"How often are in-laws staying over?"}
               handleChange={handleChange}
               displayName="Bedrooms"
             />
             <NumInput
               name={numericalFields[1]}
-              placeholder={"Try a value like 2000"}
+              placeholder={"How many square feet?"}
               handleChange={handleChange}
               displayName="Size"
             />
             <NumInput
               name={numericalFields[2]}
-              placeholder={"Try a value like 1"}
+              placeholder={"How many bathrooms do you need?"}
               handleChange={handleChange}
               displayName="Bathrooms"
             />
             <NumInput
               name={numericalFields[3]}
-              placeholder={"Try a value like 0.5"}
+              placeholder={"(Apartment's Floor)/(Total Floors)"}
               handleChange={handleChange}
               displayName="Floor Ratio"
             />

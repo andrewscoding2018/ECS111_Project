@@ -86,7 +86,7 @@ const Charts = () => {
           <a
             key={index}
             href={`#${index + 1}`}
-            className="btn btn-xs"
+            className="btn btn-md"
             onClick={() => setActiveIndex(index)}
           >
             {index + 1}
