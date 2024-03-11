@@ -11,9 +11,12 @@ import MultiSelect from "./MultiSelect";
 import NumInput from "./NumInput";
 import Charts from "./Charts";
 
-const environment = process.env.NEXT_PUBLIC_NODE_ENV
+const environment = process.env.NEXT_PUBLIC_NODE_ENV;
 
-const serverURL = (environment == "development") ? process.env.NEXT_PUBLIC_LOCAL : process.env.NEXT_PUBLIC_GCP
+const serverURL =
+  environment == "development"
+    ? process.env.NEXT_PUBLIC_LOCAL
+    : process.env.NEXT_PUBLIC_GCP;
 
 interface IResponse {
   data?: number;
@@ -56,7 +59,7 @@ const Home: React.FC = () => {
   const [selectedTenantPreference, setSelectedTenantPreference] = useState("");
   const [selectedPointOfContact, setSelectedPointOfContact] = useState("");
 
-  const [activeTab, setActiveTab] = useState('tab1');
+  const [activeTab, setActiveTab] = useState("tab1");
   const handleTabClick = (tabId: SetStateAction<string>) => {
     setActiveTab(tabId);
   };
@@ -68,30 +71,34 @@ const Home: React.FC = () => {
     setResponse({});
     setIsLoading(true);
 
-    if (selectedFurnishingStatus == "" || selectedTenantPreference == "" || selectedPointOfContact == "") {
+    if (
+      selectedFurnishingStatus == "" ||
+      selectedTenantPreference == "" ||
+      selectedPointOfContact == ""
+    ) {
       setResponse({
-        error: "You must select an option from each field."
-      })
-      setIsLoading(false)
-      return
+        error: "You must select an option from each field.",
+      });
+      setIsLoading(false);
+      return;
     }
 
     for (var key of numericalFields) {
-      console.log(key)
+      console.log(key);
       if (jsonData[key] <= 0) {
         setResponse({
-          error: "You must provide a positive value for each numerical field."
-        })
-        setIsLoading(false)
-        return
+          error: "You must provide a positive value for each numerical field.",
+        });
+        setIsLoading(false);
+        return;
       }
     }
 
-    // Timeout to prevent inconsistent load times (set to 0 when working in dev mode for faster load times)
-    const minTimeout = new Promise((resolve: any) => setTimeout(resolve, 0));
+    // Timeout to prevent inconsistent load times (set to 0 when working in dev mode for faster load times; 2000 otherwise)
+    const minTimeout = new Promise((resolve: any) => setTimeout(resolve, 2000));
 
-    if (typeof serverURL === 'undefined') {
-      throw new Error('Server URL is not defined');
+    if (typeof serverURL === "undefined") {
+      throw new Error("Server URL is not defined");
     }
 
     const payload = {
@@ -145,20 +152,34 @@ const Home: React.FC = () => {
 
   return (
     <div className="flex flex-col justify-center items-center gap-5">
-      <h1 className="md:text-3xl text-xl flex-wrap  m-3 font-semibold pt-5">
+      <h1 className="md:text-3xl text-xl flex-wrap m-3 font-semibold pt-5">
         India Major City Housing Rent Prediction
       </h1>
 
       <div role="tablist" className="tabs tabs-bordered">
-        <a role="tab" className={`tab ${activeTab === 'tab1' ? 'tab-active' : ''}`} onClick={() => handleTabClick('tab1')}>Prediction</a>
-        <a role="tab" className={`tab ${activeTab === 'tab2' ? 'tab-active' : ''}`} onClick={() => handleTabClick('tab2')}>Charts</a>
+        <a
+          role="tab"
+          className={`tab ${activeTab === "tab1" ? "tab-active" : ""}`}
+          onClick={() => handleTabClick("tab1")}
+        >
+          Prediction
+        </a>
+        <a
+          role="tab"
+          className={`tab ${activeTab === "tab2" ? "tab-active" : ""}`}
+          onClick={() => handleTabClick("tab2")}
+        >
+          Charts
+        </a>
       </div>
 
       {activeTab == "tab1" && (
-        <div className="flex flex-col justify-center items-center gap-5 w-full">
+        <div className="flex flex-col justify-center items-center gap-10 w-full">
           {/* Numerical Fields */}
-          <div className="grid md:grid-cols-2 grid-cols-1 gap-10 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-2 text-slate-700 text-xl font-bold">Numerical Fields</div>
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-10 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
+            <div className="md:col-span-2 text-xl font-bold">
+              Numerical Fields
+            </div>
             <NumInput
               name={numericalFields[0]}
               placeholder={"Try a value like 3"}
@@ -186,8 +207,10 @@ const Home: React.FC = () => {
           </div>
 
           {/* Area Types */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 p-0 font-bold">Area Types</div>
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
+            <div className="md:col-span-3 col-span-1 text-xl  p-0 font-bold">
+              Area Types
+            </div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Area"))
               .map((value, index) => (
@@ -198,14 +221,18 @@ const Home: React.FC = () => {
                   selectedValue={selectedArea}
                   setSelectedValue={setSelectedArea}
                   value={value}
-                  displayName={value.replace("Area_Type_", " ").replace("_", " ")}
+                  displayName={value
+                    .replace("Area_Type_", " ")
+                    .replace("_", " ")}
                 />
               ))}
           </div>
 
           {/* Cities */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">City</div>
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
+            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+              City
+            </div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("City_"))
               .map((value, index) => (
@@ -221,10 +248,11 @@ const Home: React.FC = () => {
               ))}
           </div>
 
-
           {/* Furnishing Status */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">Furnishing status</div>
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
+            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+              Furnishing status
+            </div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Furnishing_Status_"))
               .map((value, index) => (
@@ -243,8 +271,10 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tenant Preference */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">Tenant Preference</div>
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
+            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+              Tenant Preference
+            </div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Tenant_Preferred_"))
               .map((value, index) => (
@@ -263,8 +293,10 @@ const Home: React.FC = () => {
           </div>
 
           {/* Tenant Preference */}
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-slate-100 rounded-md">
-            <div className="md:col-span-3 col-span-1 text-xl text-slate-700 font-bold">Point of Contact</div>
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-300 rounded-md shadow-md">
+            <div className="md:col-span-3 col-span-1 text-xl  font-bold">
+              Point of Contact
+            </div>
             {Object.keys(jsonData)
               .filter((key) => key.startsWith("Point_of_Contact_Contact_"))
               .map((value, index) => (
@@ -282,7 +314,7 @@ const Home: React.FC = () => {
               ))}
           </div>
 
-          <div className="mb-40">
+          <div className="flex flex-col justify-center items-center mb-40">
             <button
               className="btn btn-outline btn-primary my-5 w-80"
               onClick={handleSubmit}
@@ -290,13 +322,22 @@ const Home: React.FC = () => {
               Submit
             </button>
             {/* Loading box */}
-            {isLoading && <progress className="progress progress-primary w-32" />}
+            {isLoading && (
+              <progress className="progress progress-primary w-32" />
+            )}
             {/* Output */}
             {response.data && (
-              <div className="mt-4 p-2 border border-green-500 rounded-lg bg-green-50">
-                <h2 className="font-bold">Your monthly rent (in rupees) costs:</h2>
-                <br></br>
-                <p>{Math.trunc(response.data)}₹</p>
+              <div className="mt-4 p-2 rounded-lg ">
+                <div className="bg-base-300 stats shadow">
+                  <div className="stat flex flex-col gap-3 justify-center items-center">
+                    <div className="stat-title">
+                      Your monthly rent (in rupees) is:
+                    </div>
+                    <div className="stat-value text-primary">
+                      {Math.trunc(response.data)}₹
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
             {response.error && (
@@ -307,13 +348,9 @@ const Home: React.FC = () => {
             )}
           </div>
         </div>
-
       )}
-      {activeTab == "tab2" && (
-        <Charts />
-      )}
+      {activeTab == "tab2" && <Charts />}
     </div>
-
   );
 };
 
