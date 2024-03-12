@@ -58,6 +58,8 @@ const Home: React.FC = () => {
   const [selectedFurnishingStatus, setSelectedFurnishingStatus] = useState("");
   const [selectedTenantPreference, setSelectedTenantPreference] = useState("");
   const [selectedPointOfContact, setSelectedPointOfContact] = useState("");
+  const [model, setModel] = useState("")
+
   let pickedFloorRatio = false
 
 
@@ -97,7 +99,7 @@ const Home: React.FC = () => {
     }
 
     // Timeout to prevent inconsistent load times (set to 0 when working in dev mode for faster load times; 2000 otherwise)
-    const minTimeout = new Promise((resolve: any) => setTimeout(resolve, 2000));
+    const minTimeout = new Promise((resolve: any) => setTimeout(resolve, 0));
 
     if (typeof serverURL === "undefined") {
       throw new Error("Server URL is not defined");
@@ -119,7 +121,7 @@ const Home: React.FC = () => {
 
     // console.log(payload)
 
-    const res = await fetch(serverURL, {
+    const res = await fetch(`${serverURL}${model}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -344,6 +346,36 @@ const Home: React.FC = () => {
                     .replace("_", " ")}
                 />
               ))}
+          </div>
+          {/* Tenant Preference */}
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-2 w-[90%] p-5 bg-base-100 rounded-md shadow-md">
+            <div className="md:col-span-3 text-xl font-medium">
+              Model Type
+            </div>
+            <MultiSelect
+              index={1}
+              name={"Base Model"}
+              selectedValue={model}
+              setSelectedValue={setModel}
+              value={""}
+              displayName={"Tensorflow (Recommended)"}
+            />
+            <MultiSelect
+              index={1}
+              name={"Forest Model"}
+              selectedValue={model}
+              setSelectedValue={setModel}
+              value={"_forest"}
+              displayName={"Random Forest (Not recommended)"}
+            />
+            <MultiSelect
+              index={1}
+              name={"MLP Model"}
+              selectedValue={model}
+              setSelectedValue={setModel}
+              value={"_mlp"}
+              displayName={"Multilayer Perceptron (scikit-learn)"}
+            />
           </div>
 
           <div className="flex flex-col justify-center items-center mb-40">

@@ -42,7 +42,6 @@ class Prediction(BaseModel):
 
 app = FastAPI()
 
-
 origins = [
     "http://localhost:3000",
     "localhost:3000",
@@ -57,23 +56,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# Load the ResNet50 
-# model pre-trained on ImageNet data
 model = tf.keras.models.load_model("app/model.h5")
 
 # Load scaler
 with open('app/scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
+with open('app/randomforest_regression_model.pkl', 'rb') as file:
+    forest_model = pickle.load(file)
+with open('app/mlp_regressor.pkl', 'rb') as file:
+    mlp_model = pickle.load(file)
 
 # Assuming the HouseFeatures model and the model for predictions are defined elsewhere
-
 @app.post("/classify")
 async def classify_result(features: HouseFeatures):
     try:
-        # Convert the Pydantic model instance to a DataFrame
-        # Assuming you meant features.dict() instead of model_dump() which is not a standard Pydantic method
-
         # Convert column names to original model column names
         column_names = [
             'BHK',
@@ -135,7 +131,141 @@ async def classify_result(features: HouseFeatures):
     }
     
     return formatted_response
+ 
 
+# Assuming the HouseFeatures model and the model for predictions are defined elsewhere
+@app.post("/classify_forest")
+async def classify_forest(features: HouseFeatures):
+    try:
+        # Convert column names to original model column names
+        column_names = [
+            'BHK',
+            'Size',
+            'Bathroom',
+            'Floor_Ratio',
+            'Area Type_Built Area',
+            'Area Type_Carpet Area',
+            'Area Type_Super Area',
+            'City_Bangalore',
+            'City_Chennai',
+            'City_Delhi',
+            'City_Hyderabad',
+            'City_Kolkata',
+            'City_Mumbai',
+            'Furnishing Status_Furnished',
+            'Furnishing Status_Semi-Furnished',
+            'Furnishing Status_Unfurnished',
+            'Tenant Preferred_Bachelors',
+            'Tenant Preferred_Bachelors/Family',
+            'Tenant Preferred_Family',
+            'Point of Contact_Contact Agent',
+            'Point of Contact_Contact Builder',
+            'Point of Contact_Contact Owner'
+        ]
+
+        # 
+        adjusted_features = {}
+
+        for i, name in enumerate(column_names):
+            adjusted_features[name] = list(features.dict().values())[i]
+
+        data = pd.DataFrame([adjusted_features])
+        
+        try:
+            # Make predictions with the model
+            prediction = forest_model.predict(data)
+        except Exception as e:
+            # Handle exceptions raised during the prediction
+            raise HTTPException(status_code=500, detail=f"Error during model prediction: {str(e)}")
+        
+        # Ensure the prediction is in the expected format
+        if prediction is None or not isinstance(prediction, (list, np.ndarray)):
+            raise ValueError("The model's prediction is not in a valid format.")
+        
+    except ValidationError as e:
+        # Handle validation errors from Pydantic
+        raise HTTPException(status_code=422, detail=f"Validation error: {e.errors()}")
+    except ValueError as e:
+        # Handle issues with the prediction format
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        # Catch-all for any other unexpected errors
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+    # Prepare the response
+    formatted_response = {
+        "prediction": float(prediction[0])  # Assuming the prediction is 2D and you want the first element
+    }
+    
+    return formatted_response
+
+
+# Assuming the HouseFeatures model and the model for predictions are defined elsewhere
+@app.post("/classify_mlp")
+async def classify_mlp(features: HouseFeatures):
+    try:
+        # Convert column names to original model column names
+        column_names = [
+            'BHK',
+            'Size',
+            'Bathroom',
+            'Floor_Ratio',
+            'Area Type_Built Area',
+            'Area Type_Carpet Area',
+            'Area Type_Super Area',
+            'City_Bangalore',
+            'City_Chennai',
+            'City_Delhi',
+            'City_Hyderabad',
+            'City_Kolkata',
+            'City_Mumbai',
+            'Furnishing Status_Furnished',
+            'Furnishing Status_Semi-Furnished',
+            'Furnishing Status_Unfurnished',
+            'Tenant Preferred_Bachelors',
+            'Tenant Preferred_Bachelors/Family',
+            'Tenant Preferred_Family',
+            'Point of Contact_Contact Agent',
+            'Point of Contact_Contact Builder',
+            'Point of Contact_Contact Owner'
+        ]
+
+        # 
+        adjusted_features = {}
+
+        for i, name in enumerate(column_names):
+            adjusted_features[name] = list(features.dict().values())[i]
+
+        data = scaler.transform(pd.DataFrame([adjusted_features]))
+        
+        try:
+            # Make predictions with the model
+            prediction = mlp_model.predict(data)
+        except Exception as e:
+            # Handle exceptions raised during the prediction
+            raise HTTPException(status_code=500, detail=f"Error during model prediction: {str(e)}")
+        
+        # Ensure the prediction is in the expected format
+        if prediction is None or not isinstance(prediction, (list, np.ndarray)):
+            raise ValueError("The model's prediction is not in a valid format.")
+        
+    except ValidationError as e:
+        # Handle validation errors from Pydantic
+        raise HTTPException(status_code=422, detail=f"Validation error: {e.errors()}")
+    except ValueError as e:
+        # Handle issues with the prediction format
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        # Catch-all for any other unexpected errors
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+    # Prepare the response
+    formatted_response = {
+        "prediction": float(prediction[0])  # Assuming the prediction is 2D and you want the first element
+    }
+    
+    return formatted_response
+ 
 
 @app.get("/")
 def hello_world():
